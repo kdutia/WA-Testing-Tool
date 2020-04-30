@@ -191,14 +191,6 @@ class FlowTestV1:
                     r = r.get_result()
                 context = r['context']
 
-                if 'text' in r['output']:
-                  innerText = r['output']['text']
-                if row['Match Output'] != '':
-                    matchedOutput = bool(re.search(row['Match Output'], '\n'.join(innerText)))
-                    if matchedOutput == False:
-                      self.reportFailure()
-                else:
-                    matchedOutput = "n/a"
 
                 return_list = []
 
@@ -212,6 +204,13 @@ class FlowTestV1:
                                 return_list.append(option['label'])
 
                 return_text = "\n".join(return_list)
+                
+                if row['Match Output'] != '':
+                    matchedOutput = bool(re.search(row['Match Output'], return_text))
+                    if matchedOutput == False:
+                      self.reportFailure()
+                else:
+                    matchedOutput = "n/a"
                         
                 if len(r['intents']) > 0:
                     matchedIntent = bool(re.search(row['Match Intent'], r['intents'][0]['intent']))
