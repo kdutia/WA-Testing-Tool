@@ -157,7 +157,7 @@ class FlowTestV1:
                 print('{} {}'.format(index, row['User Input']))            
             if row['User Input'] == 'NEWCONVERSATION':
                 self.lastTestResult()
-                workspace_id=os.environ["WORKSPACE_ID"]
+                #workspace_id=os.environ["WORKSPACE_ID"]
                 context = {}
                 if row['Context Variables'] != '':
                     context.update(row['Context Variables'])
@@ -191,6 +191,19 @@ class FlowTestV1:
                     r = r.get_result()
                 context = r['context']
 
+                def process_text_list(string_in):
+                    """
+                    Remove leading and trailing characters from each line.
+                    """
+                    nlist = string_in.split("\n")
+                    nlist = [item.strip() for item in nlist]
+                    nstring = " ".join(nlist)
+                    nlist2 = nstring.split("  ")
+                    nlist2 = [item.strip() for item in nlist2]
+
+                    return " ".join(nlist2)
+
+
 
                 return_list = []
 
@@ -205,8 +218,12 @@ class FlowTestV1:
 
                 return_text = "\n".join(return_list)
                 
+                row['Match Output'] = process_text_list(row['Match Output'])
+                return_text = process_text_list(return_text)
+
                 if row['Match Output'] != '':
-                    matchedOutput = bool(re.search(row['Match Output'], return_text))
+                    #matchedOutput = bool(re.search(row['Match Output'], return_text))
+                    matchedOutput = row['Match Output'] == return_text
                     if matchedOutput == False:
                       self.reportFailure()
                 else:
