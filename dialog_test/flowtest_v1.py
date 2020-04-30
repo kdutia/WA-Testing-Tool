@@ -199,6 +199,20 @@ class FlowTestV1:
                       self.reportFailure()
                 else:
                     matchedOutput = "n/a"
+
+                return_list = []
+
+                if 'generic' in r['output']:
+                    for item in r['output']['generic']:
+                        if item['response_type'] == 'text':
+                            return_list.append(item['text'])
+                        elif item['response_type'] == 'option':
+                            return_list.append(item['title'])
+                            for option in item['options']:
+                                return_list.append(option['label'])
+
+                return_text = "\n".join(return_list)
+                        
                 if len(r['intents']) > 0:
                     matchedIntent = bool(re.search(row['Match Intent'], r['intents'][0]['intent']))
                     if matchedIntent == False:
@@ -226,7 +240,8 @@ class FlowTestV1:
 
                 record = { 
                     'User Input': row['User Input'],
-                    'Output Text': '\n'.join(r['output']['text']),
+                    'Output Text': return_text,
+                    'output.generic': r['output']['generic'],
                     'Alternate Intents': ai,
                     'Conversation ID': r['context']['conversation_id'],
                     'Context': r['context'],
